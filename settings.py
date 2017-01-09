@@ -3,7 +3,7 @@ import tweepy
 from os.path import join, dirname
 from dotenv import load_dotenv
 from peewee import *
-from playhouse.postgres_ext import PostgresqlExtDatabase
+import praw
 
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
@@ -27,3 +27,17 @@ DB_PORT = os.environ.get("DB_PORT")
 
 database = PostgresqlDatabase(DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST,
                               port=DB_PORT)
+
+# Reddit
+REDDIT_CLIENT_ID = os.environ.get("REDDIT_CLIENT_ID")
+REDDIT_CLIENT_SECRET = os.environ.get("REDDIT_CLIENT_SECRET")
+REDDIT_USERNAME = os.environ.get("REDDIT_USERNAME")
+REDDIT_PASSWORD = os.environ.get("REDDIT_PASSWORD")
+REDDIT_SUBREDDIT = os.environ.get("REDDIT_SUBREDDIT")
+
+reddit = praw.Reddit(client_id=REDDIT_CLIENT_ID,
+                     client_secret=REDDIT_CLIENT_SECRET,
+                     user_agent='UndeleteTwitter (by /u/jorda_n)',
+                     username=REDDIT_USERNAME,
+                     password=REDDIT_PASSWORD)
+subreddit = reddit.subreddit(REDDIT_SUBREDDIT)

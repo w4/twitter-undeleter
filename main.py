@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from settings import twitter
+from settings import twitter, subreddit
 import models
 
 def main():
@@ -50,15 +50,31 @@ def main():
             # where. not the other way around.
             deleted_tweets = [t.id for t in Tweet.select().where(Tweet.id << (
                 TweetAlias.select(TweetAlias.id).order_by(TweetAlias.id.desc()).limit(3200)
-            )).where(~(Tweet.id << tweet_ids))]
+            )).where(Tweet.deleted_at == None).where(~(Tweet.id << tweet_ids))]
 
             if len(deleted_tweets):
                 # we've got some deleted tweets! update the entry in our database and
                 # tell the world about it.
                 models.Tweet.update(deleted_at=datetime.now()).where(models.Tweet.id <<
                                                                    deleted_tweets).execute()
-        except:
-            pass
+
+                for id in deleted_tweets:
+                    deleted_tweet = models.Tweet.get(id=id)
+                    screen_name = models.Tracking.get(models.Tracking.twitter == deleted_tweet.twitter).screen_name
+
+                    submission = subreddit.submit(title='@{} | {} | {}'.format(
+                        screen_name,
+                        deleted_tweet.created_at,
+                        deleted_tweet.tweet
+                    ), selftext='\0')
+
+                    twitter.update_status('.@{} has deleted a tweet from {}. {}'.format(
+                        screen_name,
+                        deleted_tweet.created_at,
+                        submission.shortlink
+                    ))
+        except Exception as e:
+            print(str(e))
 
 def save_tweets(tweets, uid):
     for tweet in tweets:

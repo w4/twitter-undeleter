@@ -14,6 +14,7 @@ class Tracking(BaseModel):
     added_by = TextField(null=True)
     id = UUIDField(primary_key=True)
     twitter = TextField(db_column='twitter_id', null=True, unique=True)
+    screen_name = TextField()
 
     class Meta:
         db_table = 'tracking'
