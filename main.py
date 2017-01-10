@@ -77,7 +77,8 @@ def main():
                         screen_name,
                         deleted_tweet.created_at,
                         deleted_tweet.tweet
-                    ), selftext=deleted_tweet.tweet)
+                    ), selftext='Original Tweet ID was {}, you might find it on an '
+                                'archive site if it\'s an old tweet!'.format(deleted_tweet.id))
 
                     twitter.update_status('.@{} has deleted a tweet from {}. {}'.format(
                         screen_name,
